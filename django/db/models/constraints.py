@@ -359,7 +359,24 @@ class UniqueConstraint(BaseConstraint):
                                 instance.unique_error_message(model, self.fields)
                             )
         else:
-            against = instance._get_field_value_map(meta=model._meta, exclude=exclude)
+            exclude_against = []
+
+            if exclude:
+                if self.fields:
+                    for field_name in self.fields:
+                        if field_name in exclude:
+                            exclude_against.append(field_name)
+                else:
+                    for expression in self.expressions:
+                        if hasattr(expression, "flatten"):
+                            for expr in expression.flatten():
+                                if isinstance(expr, F) and expr.name in exclude:
+                                    exclude_against.append(expr.name)
+                        elif isinstance(expression, F) and expression.name in exclude:
+                            exclude_against.append(expression.name)
+
+            against = instance._get_field_value_map(meta=model._meta,
+                                                    exclude=exclude_against)
             try:
                 if (self.condition & Exists(queryset.filter(self.condition))).check(
                     against, using=using

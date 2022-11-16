@@ -696,11 +696,12 @@ class UniqueConstraintTests(TestCase):
             exclude={"name"},
         )
         # Field from a condition is excluded.
-        constraint.validate(
-            UniqueConstraintProduct,
-            non_unique_product,
-            exclude={"color"},
-        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                UniqueConstraintProduct,
+                non_unique_product,
+                exclude={"color"},
+            )
 
     def test_validate_expression_str(self):
         constraint = models.UniqueConstraint("name", name="name_uniq")
