@@ -886,7 +886,7 @@ class Query(BaseExpression):
 
         # Create a new alias for this table.
         if alias_list:
-            alias = "%s%d" % (self.alias_prefix, len(self.alias_map) + 1)
+            alias = "%s_%s%d" % (table_name, self.alias_prefix, len(self.alias_map) + 1)
             alias_list.append(alias)
         else:
             # The first occurrence of a table uses the table name directly.
@@ -1066,8 +1066,8 @@ class Query(BaseExpression):
             exclude = {}
         self.change_aliases(
             {
-                alias: "%s%d" % (self.alias_prefix, pos)
-                for pos, alias in enumerate(self.alias_map)
+                alias: "%s_%s%d" % (table.table_name, self.alias_prefix, pos)
+                for pos, (alias, table) in enumerate(self.alias_map.items())
                 if alias not in exclude
             }
         )
