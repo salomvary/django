@@ -308,7 +308,7 @@ class SQLCompiler:
             else:
                 sql, params = col.select_format(self, sql, params)
             if alias is None and with_col_aliases:
-                alias = f"col{col_idx}"
+                alias = f"{col.target.column}_{col_idx}"
                 col_idx += 1
             ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
